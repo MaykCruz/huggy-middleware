@@ -1,8 +1,11 @@
 import os
 from celery import Celery
+from dotenv import load_dotenv
 
-BROKEN_URL = os.getenv("CELERY_BROKEN_URL", "redis://localhost:6379/0")
-BACKEND_URL = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+load_dotenv()
+
+BROKEN_URL = os.getenv("CELERY_BROKEN_URL")
+BACKEND_URL = os.getenv("CELERY_RESULT_BACKEND")
 
 celery_app = Celery(
     "worker",

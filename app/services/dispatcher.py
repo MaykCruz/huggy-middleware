@@ -1,4 +1,5 @@
 import logging
+from app.services.handlers import ClosedChatService
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +29,14 @@ class EventDispatcher:
         event_data = content_list[0]
         
         if event_type == "closedChat":
-            logger.info(f"🔒 Detectado fechamento de chat. ID: {event_data.get('id', {})}")
+            chat_id = event_data.get("id", {})
+
+            service = ClosedChatService()
+            service.handle(chat_id)
             
         elif event_type == "receivedAllMessage":
-            logger.info(f"💬 Detectada nova mensagem. Cliente: {event_data.get('chat', {}).get('id')}")
+            chat_id = event_data.get("chat", {}).get("id")
+            logger.info(f"💬 Detectada nova mensagem. Cliente: {chat_id}")
     
         else:
             logger.info(f"💤 Evento '{event_type}' não mapeado para ação. Ignorando.")
