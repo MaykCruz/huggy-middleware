@@ -1,4 +1,5 @@
 from app.celery_app import celery_app
+from app.services.dispatcher import EventDispatcher
 import logging
 
 logger = logging.getLogger(__name__)
@@ -6,11 +7,13 @@ logger = logging.getLogger(__name__)
 @celery_app.task(name="process_webhook_event")
 def process_webhook_event(payload: dict):
     """
-    Task assíncrona que processará o evento.
-    Pro enquanto, apenas imprime o log do worker.
+    Task puramente técnica.
+    Recebe o payload bruto e entrega para a camada de serviço.
     """
-    event_type = payload.get("messages", {}).get("type", "unknown")
-    logger.info(f"⚡ [Worker] Recebido evento do tipo: {event_type}")
-    logger.info(f"📦 Payload completo: {payload}")
-
-    return f"Processed event: {event_type}"
+    try:
+        logger.info("⚙️ [Task] Iniciando processamento via Dispatcher...")
+        EventDispatcher.dispatch(payload)
+        return "Dispatched successfully"
+    except Exception as e:
+        logger.error(f"❌ Erro no processamento da task: {str(e)}")
+        raise e
