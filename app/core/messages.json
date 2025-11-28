@@ -1,0 +1,43 @@
+{
+    "welcome": {
+        "text": "Olá, boas vindas à Empreste Digital!👋😊\n\nTemos um grande prazer em te atender!\nMe diga, como podemos te ajudar hoje?\n\nO crédito do trabalhador é ideal para quem precisa de um recurso rápido com baixo juros.",
+        "options": [
+            {"id": "1", "title": "Empréstimo CLT"},
+            {"id": "2", "title": "Antecipação FGTS"}
+        ]
+    },
+    "ask_cpf": {
+        "text": "Maravilha! 😊\nPoderia, por gentileza, me confirmar o número do seu *CPF* (apenas números), para que eu possa realizar a simulação certinho?\n\nLembrando que seus dados são usados apenas para consulta, sem compromisso algum!"
+    },
+    "feature_not_ready": {
+        "text": "Essa funcionalidade ainda está em desenvolvimento. 🚧\nPor enquanto, vamos focar no Empréstimo CLT."
+    },
+    "cpf_invalid": {
+        "text": "⚠️ O CPF informado parece inválido.\nPor favor, digite novamente apenas os números (11 dígitos)."
+    },
+    "cpf_valid_ask_registry": {
+        "text": "CPF validado! ✅\n\nVocê está registrado há mais de 6 meses no emprego atual?",
+        "options": [
+            {"id": "1", "title": "Sim, estou"},
+            {"id": "2", "title": "Não estou"}
+        ]
+    },
+    "simulating": {
+        "text": "Perfeito! Iniciando simulação para o CPF {cpf} nos nossos bancos parceiros... Aguarde um momento. ⏳"
+    },
+    "simulation_result": {
+        "text": "Simulação concluída! 🎉\n\nPré-aprovamos R$ 1.500,00.\nUm de nossos consultores vai entrar em contato agora para finalizar."
+    },
+    "requirements_fail": {
+        "text": "Poxa, infelizmente para essa modalidade é necessário ter 6 meses de registro. 😕\n\nMas não se preocupe, vamos finalizar este atendimento por enquanto."
+    },
+    "fallback_human": {
+        "text": "Não entendi sua resposta. Vou transferir para um especialista humano te ajudar. 👨‍💻"
+    },
+    "generic_error": {
+        "text": "Ocorreu um erro interno. Tente novamente mais tarde."
+    },
+    "invalid_cpf_fallback_human": {
+        "text": "Ainda não consegui validar seu CPF. Vou chamar um humano para te ajudar."
+    }
+}
