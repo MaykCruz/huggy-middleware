@@ -1,0 +1,39 @@
+import logging
+import os
+from logtail import LogtailHandler
+
+def setup_logging():
+    """
+    Configura o logger raiz.
+    """
+    log_formatter = logging.Formatter(
+        fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+
+    root_logger = logging.getLogger()
+    if root_logger.hasHandlers():
+        root_logger.handlers.clear()
+    
+    root_logger.setLevel(logging.INFO)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(log_formatter)
+    root_logger.addHandler(console_handler)
+
+    token = os.getenv("BETTER_STACK_SOURCE_TOKEN")
+    endpoint = os.getenv("BETTER_STACK_INGEST_URL")
+
+    if token:
+        try:
+            if endpoint:
+                handler = LogtailHandler(source_token=token, host=endpoint)
+            else:
+                handler = LogtailHandler(source_token=token)
+
+            handler.setFormatter(log_formatter)
+            root_logger.addHandler(handler)
+            logging.info("🚀 [System] Better Stack Logging conectado com sucesso.")
+        except Exception as e:
+            print(f"❌ Erro ao configurar Better Stack: {e}")
+    else:
+        print("⚠️ BETTER_STACK_SOURCE_TOKEN não encontrado. Logs apenas locais.")

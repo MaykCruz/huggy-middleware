@@ -30,11 +30,12 @@ services:
       - redis
     env_file:
       - .env
+    restart: always
 
   # 4. Background Worker (Celery)
   worker:
     build: .
-    command: celery -A app.celery_app worker --loglevel=info
+    command: celery -A app.celery_app worker --loglevel=info -Q main-queue
     volumes:
       - .:/code
     depends_on:
@@ -42,6 +43,7 @@ services:
       - redis
     env_file:
       - .env
+    restart: always
 
 volumes:
   postgres_data:

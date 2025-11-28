@@ -1,6 +1,12 @@
 from fastapi import FastAPI
+from dotenv import load_dotenv
 from app.celery_app import celery_app
 from app.routers import webhooks
+from app.core.logger import setup_logging
+
+load_dotenv()
+
+setup_logging()
 
 app = FastAPI(title="Huggy Middleware")
 
