@@ -2,6 +2,9 @@ import httpx
 import logging
 from typing import Dict, Any, List
 from app.integrations.facta.auth import FactaAuth
+from app.integrations.facta.translator import FactaTranslator
+from app.integrations.facta.schemas import BalanceResult
+from app.core.domain.enums import BankQueryStatus
 
 logger = logging.getLogger(__name__)
 
