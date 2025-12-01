@@ -39,16 +39,27 @@ class FactaFGTSAdapter:
 
                 if response.status_code == 403 and 'cloudflare' in response.text.lower():
                     logger.critical(f"🛡️ [Facta] Bloqueio de WAF/Cloudflare detectado!")
-                    return {"erro": True, "mensagem": "Bloqueio de Segurança (Cloudflare)"}
-                
-                return response.json()
+                    json_data = {"erro": True, "mensagem": "Bloqueio Cloudflare", "erro_http": True}
+                elif response.status_code != 200:
+                    json_data = {"erro": True, "mensagem": f"HTTP {response.status_code}", "erro_http": True}
+                else:
+                    json_data = response.json()
         
-        except httpx.ReadTimeout:
-            logger.error("❌ [Facta] Timeout na consulta de saldo.")
-            return {"erro": True, "mensagem": "Timeout na consulta de saldo"}
         except Exception as e:
             logger.error(f"❌ [Facta] Erro técnico saldo: {e}")
-            return {"erro": True, "mensagem": str(e)}
+            json_data = {"erro": True, "mensagem": str(e), "erro_http": True}
+        
+        status, msg, saldo = FactaTranslator.interpret_balance_response(json_data)
+
+        if status != BankQueryStatus.SUCCESS:
+            logger.warning(f"⚠️ [Facta] Resposta Negativa: {status.value} - {msg}")
+        
+        return BalanceResult(
+            status=status,
+            saldo=saldo,
+            original_message=msg,
+            raw_data=json_data     
+        )
 
     def calculate_simulation(self, cpf: str, tabela: int, taxa: float, parcelas: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
