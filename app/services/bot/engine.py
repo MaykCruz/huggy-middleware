@@ -1,7 +1,8 @@
 import logging
-from app.services.session import SessionManager
-from app.services.huggy_api import HuggyClient
+from app.services.bot.session import SessionManager
+from app.integrations.huggy.service import HuggyService
 from app.utils.validators import validate_cpf, clean_digits
+from app.services.credit.proposal import ProposalService
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +12,8 @@ class BotEngine:
     """
     def __init__(self):
         self.session = SessionManager()
-        self.huggy = HuggyClient()
+        self.huggy = HuggyService()
+        self.proposal_service = ProposalService()
 
     def process(self, chat_id: int, message_text: str):
         current_state = self.session.get_state(chat_id)
@@ -75,14 +77,37 @@ class BotEngine:
             if opt == "1":
                 # SIMULAR (Temos CPF e temos Requisito)
                 cpf_salvo = context.get("cpf", "N/A")
+
                 self.huggy.send_message(chat_id, "simulating", variables={"cpf": cpf_salvo})
                 
-                # AQUI ENTRARIA A CHAMADA DA API DE SIMULAÇÃO (Fase 6)
-                # ... result = api.simular(cpf_salvo) ...
+                sim_response = self.proposal_service.simulate_fgts(cpf_salvo)
 
-                self.huggy.send_message(chat_id, "simulation_result")
-                self.huggy.start_auto_distribution(chat_id) # Entrega o lead pronto
-                next_state = "FINISHED"
+                if sim_response.message_key:
+                    self.huggy.send_message(chat_id, sim_response.message_key, variables=sim_response.message_args)
+                
+                if sim_response.internal_log:
+                    self.huggy.send_message(chat_id, "dynamic_text", variables={"content": f"🔒 Sistema: {sim_response.internal_log}"}, force_internal=True)
+
+                action = sim_response.action_status
+                
+                if action == "COMPLETED":
+                    # Sucesso: Distribui para humano fechar
+                    self.huggy.start_auto_distribution(chat_id)
+                    next_state = "FINISHED"
+
+                elif action == "PENDING_AUTH":
+                    # Pausa o fluxo aqui. O cliente vai ler "Autorize no app" e responder depois.
+                    next_state = "WAITING_AUTHORIZATION" 
+
+                elif action == "PENDING_ADESAO":
+                    # Encerra (Regra de negócio: não esperamos adesão na linha)
+                    self.huggy.start_auto_distribution(chat_id)
+                    next_state = "FINISHED"
+
+                else: # FAILED (Sem saldo, bloqueio, etc)
+                    tab_id = self.huggy.tabulations.get("REQUIREMENTS_FAIL")
+                    self.huggy.finish_attendance(chat_id, tabulation_id=tab_id)
+                    next_state = "FINISHED"
 
             elif opt == "2":
                 # NÃO ATINGIU REQUISITO

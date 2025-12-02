@@ -1,6 +1,6 @@
 import logging
-from app.services.session import SessionManager
-from app.services.huggy_api import HuggyClient
+from app.services.bot.session import SessionManager
+from app.integrations.huggy.service import HuggyService
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ class ClosedChatService:
     """
     def __init__(self):
         self.session = SessionManager()
-        self.huggy = HuggyClient()
+        self.huggy = HuggyService()
     
     def handle(self, chat_id: int):
         """
@@ -37,7 +37,7 @@ class IncomingMessageService:
     Sua função é extrair os dados vitais e passar para o Motor de Decisão (Engine).
     """
     def __init__(self):
-        from app.services.bot_engine import BotEngine
+        from app.services.bot.engine import BotEngine
         self.engine = BotEngine()
     
     def handle(self, event_data: dict):

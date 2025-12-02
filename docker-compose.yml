@@ -35,7 +35,7 @@ services:
   # 4. Background Worker (Celery)
   worker:
     build: .
-    command: celery -A app.celery_app worker --loglevel=info -Q main-queue
+    command: celery -A app.infrastructure.celery worker --loglevel=info -Q main-queue
     volumes:
       - .:/code
     depends_on:
@@ -44,6 +44,16 @@ services:
     env_file:
       - .env
     restart: always
+  
+  redis-insight:
+    image: redis/redisinsight:latest
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+    volumes:
+      - redis_insight_data:/data 
 
 volumes:
   postgres_data:
+  redis_insight_data:

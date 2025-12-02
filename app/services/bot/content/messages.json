@@ -39,5 +39,29 @@
     },
     "invalid_cpf_fallback_human": {
         "text": "Ainda não consegui validar seu CPF. Vou chamar um humano para te ajudar."
+    },
+    "facta_success": {
+        "text": "Conseguimos liberar *R$ {valor}* pelo Banco Facta! 🎉"
+    },
+    "facta_error_auth": {
+        "text": "⚠️ Identificamos que falta a autorização do Banco Facta no seu aplicativo do FGTS.\nPor favor, entre no app e autorize o banco."
+    },
+    "facta_error_adesao": {
+        "text": "⚠️ Você precisa aderir à modalidade 'Saque-Aniversário' no aplicativo do FGTS antes de continuar."
+    },
+    "facta_error_balance": {
+        "text": "No momento, seu saldo disponível não atingiu o mínimo para antecipação nesta modalidade."
+    },
+    "facta_error_mismatch": {
+        "text": "O banco retornou uma divergência cadastral. Por favor, verifique seus dados pessoais junto à Caixa."
+    },
+    "facta_error_birthday": {
+        "text": "Devido à janela do seu mês de aniversário, não conseguimos operar essa linha de crédito hoje."
+    },
+    "facta_error_generic": {
+        "text": "Não conseguimos gerar uma oferta para este CPF no momento."
+    },
+    "dynamic_text": {
+        "text": "{content}"
     }
 }

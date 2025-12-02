@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from app.celery_app import celery_app
+from app.infrastructure.celery import celery_app
 from app.routers import webhooks
 from app.core.logger import setup_logging
 

@@ -3,7 +3,7 @@ import base64
 import httpx
 import logging
 import time
-from app.core.security.token_manager import TokenManager
+from app.infrastructure.token_manager import TokenManager
 
 logger = logging.getLogger(__name__)
 
