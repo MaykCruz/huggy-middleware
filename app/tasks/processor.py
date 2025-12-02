@@ -1,5 +1,5 @@
 from app.infrastructure.celery import celery_app
-from app.services.events.dispatcher import EventDispatcher
+from app.events.dispatcher import EventDispatcher
 import logging
 import httpx
 

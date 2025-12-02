@@ -1,8 +1,7 @@
 import logging
-from app.services.bot.session import SessionManager
+from app.services.bot.memory.session import SessionManager
 from app.integrations.huggy.service import HuggyService
 from app.utils.validators import validate_cpf, clean_digits
-from app.services.credit.proposal import ProposalService
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +12,6 @@ class BotEngine:
     def __init__(self):
         self.session = SessionManager()
         self.huggy = HuggyService()
-        self.proposal_service = ProposalService()
 
     def process(self, chat_id: int, message_text: str):
         current_state = self.session.get_state(chat_id)

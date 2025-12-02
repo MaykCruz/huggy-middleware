@@ -1,6 +1,6 @@
 import logging
 import os
-from app.services.events.handlers import ClosedChatService, IncomingMessageService
+from app.events.handlers import ClosedChatService, IncomingMessageService
 
 logger = logging.getLogger(__name__)
 
