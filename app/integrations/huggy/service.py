@@ -7,10 +7,10 @@ logger = logging.getLogger(__name__)
 
 class HuggyService:
     """
-    Cama de Facade (Fachada) que combina métodos da API para realizar ações de negócio da Empreste Digital.
+    Cama de Facade (Fachada) que combina métodos da API para realizar ações de negócio.
+    Correção: Delega chamadas de infraestrutura explicitamente para self.client.
     """
     def __init__(self):
-
         self.client = HuggyClient()
 
         self.workflow_steps = {
@@ -22,7 +22,8 @@ class HuggyService:
         }
 
         self.tabulations = {
-            "LESS_SIX_MONTHS": os.getenv("HUGGY_TABULATION_LESS_SIX_MONTHS")
+            "MENOS_SEIS_MESES": os.getenv("HUGGY_TABULATION_LESS_SIX_MONTHS"),
+            "SEM_SALDO": os.getenv("HUGGY_TABULATION_SEM_SALDO")
         }
 
     def send_message(self, chat_id: int, message_key: str, variables: Dict[str, Any] = None, file_url: Optional[str] = None, force_internal: bool = False) -> bool:
@@ -31,34 +32,36 @@ class HuggyService:
     def finish_attendance(self, chat_id: int, tabulation_id: Union[int, str], send_feedback: bool = False) -> bool:
         """
         Smart Wrapper: Tira do Workflow + Fecha com Tabulação.
-        Uso Obrigatório: Deve-se passar o tabulation_id;
         """
         if not tabulation_id:
-            logger.error(f"❌ Tentativa de fechar Chat {chat_id} sem Tabulação! Abortando para garantir integridade.")
+            logger.error(f"❌ Tentativa de fechar Chat {chat_id} sem Tabulação! Abortando.")
             return False
         
         logger.info(f"📉 [SmartClose] Finalizando Chat {chat_id} com Tabulação {tabulation_id}...")
 
         self.remove_from_workflow(chat_id)
 
-        return self.close_chat(chat_id, tabulation_id=tabulation_id, send_feedback=send_feedback)
+        # CORREÇÃO: Chama close_chat do client
+        return self.client.close_chat(chat_id, tabulation_id=tabulation_id, send_feedback=send_feedback)
 
     def remove_from_workflow(self, chat_id: int) -> bool:
         """Ação: Retirar do workflow"""
-        return self.update_workflow_step(chat_id, self.API_VALUE_EXIT_WORKFLOW)
+        # CORREÇÃO: Usa constante do client e chama método do client
+        return self.client.update_workflow_step(chat_id, self.client.API_VALUE_EXIT_WORKFLOW)
     
     def move_to_ag_formalizar(self, chat_id: int) -> bool:
         """Ação: Mover para etapa Aguardando Formalizar"""
         step_id = self.workflow_steps.get("WORKFLOW_STEP_AG_FORMALIZAR")
         if not step_id:
-            logger.warning(f"⚠️ Tentativa de mover Chat {chat_id} para WORKFLOW_STEP_AG_FORMALIZAR, mas variável de ambiente não está configurada.")
+            logger.warning(f"⚠️ Tentativa de mover Chat {chat_id} para AG_FORMALIZAR, mas env var não configurada.")
             return False
-        return self.update_workflow_step(chat_id, step_id)
+        
+        # CORREÇÃO: Chama método do client
+        return self.client.update_workflow_step(chat_id, step_id)
     
     def start_auto_distribution(self, chat_id: int) -> bool:
         """
-        Wrapper Semântico: Inicia o fluxo de autodistribuição.
-        Útil para quando o cliente finaliza o cadastro e deve ir para um humano.
+        Inicia o fluxo de autodistribuição.
         """
         flow_id = self.flows.get("AUTO_DISTRIBUTION")
 
@@ -67,7 +70,8 @@ class HuggyService:
             return False
         
         try:
-            return self.trigger_flow(chat_id, int(flow_id))
+            # CORREÇÃO: Chama trigger_flow do client
+            return self.client.trigger_flow(chat_id, int(flow_id))
         except ValueError:
             logger.error(f"❌ ID do Flow inválido no .env: {flow_id}")
             return False

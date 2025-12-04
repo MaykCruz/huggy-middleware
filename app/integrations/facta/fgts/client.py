@@ -74,7 +74,7 @@ class FactaFGTSAdapter:
                 else:
                     return {
                         "status": "REPROVADO", 
-                        "msg_original": data.get("mensagem")
+                        "msg_original": data.get("msg")
                     }
         except Exception as e:
             return {"status": "ERRO_TECNICO", "msg_original": str(e)}

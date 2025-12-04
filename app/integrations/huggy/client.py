@@ -2,7 +2,7 @@ import httpx
 import os
 import logging
 from typing import Union, Dict, Any, Optional
-from app.services.bot.message_loader import MessageLoader
+from app.services.bot.content.message_loader import MessageLoader
 
 logger = logging.getLogger(__name__)
 
@@ -13,8 +13,6 @@ class HuggyClient:
         self.api_token = os.getenv("HUGGY_API_TOKEN")
         self.base_url = "https://api.huggy.app/v3/companies/351946"
 
-        
-        
         if not self.api_token:
             logger.warning("⚠️ HUGGY_API_TOKEN não configurado. As chamadas à API falharão.")
 
@@ -39,7 +37,7 @@ class HuggyClient:
         template = MessageLoader.get(message_key)
         if not template and not message_key.startswith("DYNAMIC"):
             logger.error(f"❌ Template '{message_key}' não encontrado.")
-            raise ValueError(f"Message key '{message_key}' not found.")
+            return False
         
         raw_text = template.get("text", "")
         final_text = raw_text
@@ -50,7 +48,6 @@ class HuggyClient:
             except KeyError as e:
                 logger.error(f"⚠️ Falta variável {e} para mensagem '{message_key}'")
                 final_text = raw_text
-        
         
         payload = {
             "text": final_text

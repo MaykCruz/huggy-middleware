@@ -5,17 +5,42 @@ def interpretar_retorno(data: dict) -> str:
         return "SUCESSO"
     
     code = data.get("codigo")
-    msg =data.get("mensagem", "").lower()
+    msg = data.get("mensagem", "").lower()
 
-    if "volte em" in msg: return "WAITING_API"
-    if code == 7: return "SEM_AUT"
-    if code == 9: return "SEM_ADESAO"
-    if code == 35: return "MUDANCAS_CADASTRAIS"
-    if code in [5, 10]: return "ANIVERSARIANTE"
-    if code in [101, 102, 104] or "não possui saldo" in msg or "não encontrado" in msg:
+    # Retorno genérico
+    if "volte em" in msg: 
+        return "WAITING_API"
+
+    # Sem autorização
+    if code == 7 or "instituição fiduciária não possui autorização do trabalhador" in msg:
+        return "SEM_AUTORIZACAO"
+
+    # Sem adesão
+    if code == 9 or "trabalhador não possui adesão ao saque aniversário vigente" in msg: 
+        return "SEM_ADESAO"
+
+    # Mudanças cadastrais
+    if code == 35 or "mudanças cadastrais na conta do fgts foram realizadas, que impedem a contratação" in msg: 
+        return "MUDANCAS_CADASTRAIS"
+
+    # Aniversariante
+    termos_aniversariante = [
+        "existe uma operação fiduciária em andamento",
+        "operação não permitida antes de"
+    ]
+
+    if code in [5, 10] or any(termo in msg for termo in termos_aniversariante): 
+        return "ANIVERSARIANTE"
+    
+    # Saldo não encontrado
+    if code == 102 or "saldo não encontrado." in msg:
+        return "SALDO_NAO_ENCONTRADO"
+
+    # Sem saldo
+    if code == 101 or "cliente não possui saldo fgts" in msg:
         return "SEM_SALDO"
         
-    return "ERRO_GENERICO"
+    return "RETORNO_DESCONHECIDO"
 
 def organizar_parcelas(retorno_saldo: dict) -> list:
     parcelas = []

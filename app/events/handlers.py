@@ -1,5 +1,5 @@
 import logging
-from app.services.bot.session import SessionManager
+from app.services.bot.memory.session import SessionManager
 from app.integrations.huggy.service import HuggyService
 
 logger = logging.getLogger(__name__)

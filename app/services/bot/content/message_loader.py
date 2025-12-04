@@ -14,7 +14,7 @@ class MessageLoader:
             return
         
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        json_path = os.path.join(base_dir, '..', 'core', 'messages.json')
+        json_path = os.path.join(base_dir, 'messages.json')
 
         try:
             with open(json_path, encoding='utf-8') as f:
