@@ -135,8 +135,7 @@ class HuggyClient:
         if step_id == self.API_VALUE_EXIT_WORKFLOW:
             action_name = "REMOVER do workflow"
         else:
-            friendly_name = next((k for k, v in self.workflow_steps.items() if v == str(step_id)), str(step_id))
-            action_name = f"mover para etapa {friendly_name}"
+            action_name = f"mover para etapa {step_id}"
         
         try:
             with httpx.Client(timeout=10.0) as client:

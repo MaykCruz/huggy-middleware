@@ -12,53 +12,52 @@
     "cpf_invalido": {
         "text": "⚠️ O CPF informado parece inválido.\nPor favor, digite novamente apenas os números (11 dígitos)."
     },
-    "cpf_valid_ask_registry": {
-        "text": "CPF validado! ✅\n\nVocê está registrado há mais de 6 meses no emprego atual?",
+    "cpf_invalido_fallback": {
+        "text": "Cliente informou CPF inválido mais de uma vez. Autodistribuindo..."
+    },
+    "com_saldo": {
+        "text": "Realizei a simulação e *R$ {valor}* estão liberados! 💸\nEsse valor libera em sua conta ainda hoje!\n\nPara prosseguirmos basta enviar sua chave pix!"
+    },
+    "com_saldo_conta": {
+        "text": "Realizei a simulação e *R$ {valor}* estão liberados! 💸\nEsse valor libera em sua conta ainda hoje!\n\nPosso prosseguir com a liberação na sua conta abaixo?\n\n{dados_bancarios}",
         "options": [
-            {"id": "1", "title": "Sim, estou"},
-            {"id": "2", "title": "Não estou"}
+            {"id": "1", "title": "Pode prosseguir!"},
+            {"id": "2", "title": "Alterar minha conta!"},
+            {"id": "3", "title": "Tenho dúvidas!"}
         ]
     },
+    "sem_autorizacao": {
+        "text": "Tentei realizar a simulação, porém está constando que o banco está sem autorização 😕 Poderia, por gentileza, autorizar esses bancos no seu aplicativo do FGTS?\n\nRealizando a autorização consigo consultar aqui bem rapidinho!\n\n👉🏼 FACTA FINANCEIRA\n👉🏼 BMS SOCIEDADE DE CREDITO\n\nCaso precise de ajuda é só me chamar!",
+        "file": "https://i.postimg.cc/0y4W7r2R/passo_a_passo.jpg"
+    },
+    "sem_adesao": {
+        "text": "Verifiquei que você ainda não aderiu ao saque aniversário do FGTS, irei te encaminhar para um atendente auxiliá-lo pelo app!"
+    },
+    "mudancas_cadastrais": {
+        "text": "Realizei a simulação e consta que foram feitas Mudanças Cadastrais na sua conta do FGTS que impedem de prosseguir com a liberação.\n\nProvavelmente a Caixa realizou alguma atualização automática em seus dados, vamos aguardar geralmente demora de 2 ou 3 dias para atualizar!\n\nMas não se preocupe, iremos consultar todos os dias para verificar se já liberou !!!"
+    },
+    "saldo_nao_encontrado": {
+        "text": "Infelizmente não vou conseguir realizar a simulação devido a um erro da Caixa que não encontra o seu saldo!\nA orientação é que procure uma agência da Caixa Econômica para resolução desse erro!",
+        "file": "https://i.postimg.cc/BQqR2chG/saldo-nao-encontrado.jpg"
+
+    },
+    "sem_saldo": {
+        "text": "Acabei de consultar aqui e seu saldo ainda não atualizou! As atualizações começam dia 20 e vão até o dia 27, no decorrer desses dias já deve liberar! Vou consultando aqui e assim que estiver liberando te chamo ☺"
+    },
+    "retorno_desconhecido": {
+        "text": "Ocorreu um erro inesperado durante a simulação. Autodistribuindo..."
+    },
     "iniciando_simulacao": {
-        "text": "Perfeito! Iniciando simulação para o CPF {cpf} nos nossos bancos parceiros... Aguarde um momento. ⏳"
+        "text": "Agradeço! Só um instante que já irei realizar a simulação.\n\nAviso que pode demorar alguns minutinhos, pois os bancos estão apresentando lentidão essa semana devido ao alto fluxo! Assim que o banco retornar sua simulação eu já te informo."
     },
-    "resultado_simulacao": {
-        "text": "Simulação concluída! 🎉\n\nPré-aprovamos R$ 1.500,00.\nUm de nossos consultores vai entrar em contato agora para finalizar."
+    "atendente_fallback": {
+        "text": "Não entendi a sua escolha, estou encaminhando para um atendente! Um momento."
     },
-    "requirements_fail": {
-        "text": "Poxa, infelizmente para essa modalidade é necessário ter 6 meses de registro. 😕\n\nMas não se preocupe, vamos finalizar este atendimento por enquanto."
-    },
-    "fallback_human": {
-        "text": "Não entendi sua resposta. Vou transferir para um especialista humano te ajudar. 👨‍💻"
-    },
-    "generic_error": {
-        "text": "Ocorreu um erro interno. Autodistribuindo"
-    },
-    "invalid_cpf_fallback_human": {
-        "text": "Ainda não consegui validar seu CPF. Vou chamar um humano para te ajudar."
-    },
-    "proposal_success": {
-        "text": "Conseguimos liberar R$ *{valor}* pelo {banco}! 🎉"
-    },
-    "facta_error_auth": {
-        "text": "⚠️ Identificamos que falta a autorização do Banco Facta no seu aplicativo do FGTS.\nPor favor, entre no app e autorize o banco."
-    },
-    "facta_error_adesao": {
-        "text": "⚠️ Você precisa aderir à modalidade 'Saque-Aniversário' no aplicativo do FGTS antes de continuar."
-    },
-    "facta_error_balance": {
-        "text": "No momento, seu saldo disponível não atingiu o mínimo para antecipação nesta modalidade."
-    },
-    "facta_error_mismatch": {
-        "text": "O banco retornou uma divergência cadastral. Por favor, verifique seus dados pessoais junto à Caixa."
-    },
-    "facta_error_birthday": {
-        "text": "Devido à janela do seu mês de aniversário, não conseguimos operar essa linha de crédito hoje."
-    },
-    "facta_error_generic": {
-        "text": "Não conseguimos gerar uma oferta para este CPF no momento."
-    },
-    "dynamic_text": {
-        "text": "{content}"
+    "tempo_de_registro": {
+        "text": "Perfeito, já recebi seu CPF. Você possui mais de 6 meses de registro no emprego atual?",
+        "options": [
+            {"id": "1", "title": "Sim"},
+            {"id": "2", "title": "Não"}
+        ]
     }
 }

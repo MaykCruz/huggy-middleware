@@ -2,8 +2,9 @@ import logging
 from app.services.bot.memory.session import SessionManager
 from app.integrations.huggy.service import HuggyService
 from app.services.products.fgts_service import FGTSService 
+from app.schemas.credit import AnalysisStatus
 from app.utils.validators import validate_cpf, clean_digits
-from app.utils.formatters import formatar_moeda
+
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +59,7 @@ class BotEngine:
                 context["cpf"] = cpf_limpo
                 self.session.set_context(chat_id, context)
 
-                self.huggy.send_message(chat_id, "cpf_valid_ask_registry")
+                self.huggy.send_message(chat_id, "tempo_de_registro")
                 next_state = "CLT_AGUARDANDO_TEMPO_REGISTRO"
             
             else:
@@ -71,12 +72,13 @@ class BotEngine:
                     self.huggy.start_auto_distribution(chat_id)
                     next_state = "FINISHED"
 
-        # (Adicione aqui a lógica de CLT_AGUARDANDO_TEMPO_REGISTRO se tiver)
+        # Lógica de CLT_AGUARDANDO_TEMPO_REGISTRO
         elif current_state == "CLT_AGUARDANDO_TEMPO_REGISTRO":
             opt = message_text.strip()
 
             if opt == "1": # Possui o mínimo de 6 meses.
                 self.huggy.send_message(chat_id, "iniciando_simulacao") # Retorno genérico pois ainda não temos o service do clt
+                self.huggy.start_auto_distribution(chat_id)
                 next_state = "FINISHED"
             
             elif opt == "2": # Não possui o mínimo de 6 meses.
@@ -91,61 +93,56 @@ class BotEngine:
             cpf_limpo = clean_digits(message_text)
             
             if validate_cpf(cpf_limpo):
-                # 1. CPF VÁLIDO: Salva contexto
+                # 1. Salvar Contexto
                 context["cpf"] = cpf_limpo
                 self.session.set_context(chat_id, context)
 
-                # 2. FEEDBACK E SIMULAÇÃO IMEDIATA
+                # 2. Feedback de "Simulando..."
                 # Não mudamos para um estado intermediário, executamos já.
-                self.huggy.send_message(chat_id, "iniciando_simulacao", variables={"cpf": cpf_limpo})
+                self.huggy.send_message(chat_id, "iniciando_simulacao")
                 
                 # Chama o Service Global
-                resultado = self.fgts_service.consultar_melhor_oportunidade(cpf_limpo)
+                oferta = self.fgts_service.consultar_melhor_oportunidade(cpf_limpo)
 
-                # 3. TRATAMENTO DO RESULTADO
-                if resultado.get("aprovado"):
-                    # SUCESSO
-                    raw_val = resultado["detalhes"]["valor_liquido"]
-                    val_liquido = formatar_moeda(raw_val)
+                self.huggy.send_message(
+                    chat_id,
+                    oferta.message_key,
+                    variables=oferta.variables,
+                    force_internal=oferta.is_internal
+                )
 
-                    banco = resultado.get("banco_origem", "Parceiro")
-
-                    self.huggy.send_message(
-                        chat_id, 
-                        "proposal_success", 
-                        variables={"valor": f"{val_liquido}", "banco": banco}
-                    )
+                if oferta.status == AnalysisStatus.APROVADO:
+                    self.huggy.move_to_aprovado(chat_id)
                     self.huggy.start_auto_distribution(chat_id)
                     next_state = "FINISHED"
+
+                if oferta.status == AnalysisStatus.SEM_AUTORIZACAO:
+                    self.huggy.start_flow_authorization(chat_id)
+                    next_state = "FINISHED"
+
+                if oferta.status == AnalysisStatus.SEM_ADESAO:
+                    self.huggy.start_auto_distribution(chat_id)
+                    next_state = "FINISHED"
+
+                if oferta.status == AnalysisStatus.MUDANCAS_CADASTRAIS:
+                    self.huggy.finish_attendance(chat_id, tabulation_id=self.huggy.tabulations.get("MUDANCAS_CADASTRAIS"))
+                    next_state = "FINISHED"
                 
-                else:
-                    # ERRO / REPROVAÇÃO
-                    motivo = resultado.get("motivo")
-                    logger.info(f"⛔ Recusa FGTS para {cpf_limpo}: {motivo}")
+                if oferta.status == AnalysisStatus.ANIVERSARIANTE:
+                    self.huggy.finish_attendance(chat_id, tabulation_id=self.huggy.tabulations.get("ANIVERSARIANTE"))
+                    next_state = "FINISHED"
+                
+                if oferta.status == AnalysisStatus.SALDO_NAO_ENCONTRADO:
+                    self.huggy.finish_attendance(chat_id, tabulation_id=self.huggy.tabulations.get("SALDO_NAO_ENCONTRADO"))
+                    next_state = "FINISHED"
 
-                    if motivo == "SEM_AUT":
-                        self.huggy.send_message(chat_id, "facta_error_auth")
-                        next_state = "WAITING_AUTHORIZATION"
-                    
-                    elif motivo == "SEM_SALDO":
-                        self.huggy.send_message(chat_id, "facta_error_balance")
-                        # Finaliza com tabulação específica
-                        if self.huggy.tabulations.get("SEM_SALDO"):
-                            self.huggy.finish_attendance(chat_id, tabulation_id=self.huggy.tabulations.get("SEM_SALDO"))
-                        next_state = "FINISHED"
-
-                    elif motivo == "SALDO_INSUFICIENTE_PARA_OPERACAO":
-                        self.huggy.send_message(chat_id, "facta_error_balance")
-                        # Finaliza com tabulação específica
-                        if self.huggy.tabulations.get("SEM_SALDO"):
-                            self.huggy.finish_attendance(chat_id, tabulation_id=self.huggy.tabulations.get("SEM_SALDO"))
-                        next_state = "FINISHED"
-
-                    else:
-                        # Erro Genérico
-                        self.huggy.send_message(chat_id, "generic_error", force_internal=True)
-                        self.huggy.start_auto_distribution(chat_id)
-                        next_state = "FINISHED"
+                if oferta.status == AnalysisStatus.SEM_SALDO:
+                    self.huggy.finish_attendance(chat_id, tabulation_id=self.huggy.tabulations.get("SEM_SALDO"))
+                    next_state = "FINISHED"
+                
+                if oferta.status == AnalysisStatus.RETORNO_DESCONHECIDO:
+                    self.huggy.start_auto_distribution(chat_id)
+                    next_state = "FINISHED"
             
             else:
                 # CPF INVÁLIDO (Lógica de retry)
@@ -153,7 +150,7 @@ class BotEngine:
                     self.huggy.send_message(chat_id, "cpf_invalid")
                     next_state = "FGTS_CPF_INVALIDO"
                 else:
-                    self.huggy.send_message(chat_id, "invalid_cpf_fallback_human")
+                    self.huggy.send_message(chat_id, "cpf_invalido_fallback", force_internal=True)
                     self.huggy.start_auto_distribution(chat_id)
                     next_state = "FINISHED"
 
@@ -168,5 +165,5 @@ class BotEngine:
     
     def _handoff_human(self, chat_id: int):
         """Helper para transferir em caso de erro/imcompreensão"""
-        self.huggy.send_message(chat_id, "fallback_human")
+        self.huggy.send_message(chat_id, "atendente_fallback")
         self.huggy.start_auto_distribution(chat_id)

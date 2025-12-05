@@ -51,13 +51,11 @@ class FactaFGTSService:
             return {
                 "aprovado": False,
                 "motivo": "SEM_SALDO",
-                "mensagem_amigavel": "Você possui saldo, mas o valor das parcelas não atinge o mínimo exigido pelo banco.",
                 "msg_tecnica": resp_calculo.get("msg_original")
             }
 
         return {
             "aprovado": False,
             "motivo": "ERRO_TECNICO",
-            "mensagem_amigavel": "Ocorreu um erro ao calcular sua proposta.",
             "msg_tecnica": resp_calculo.get("msg_original")
         }

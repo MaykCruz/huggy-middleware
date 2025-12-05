@@ -12,7 +12,7 @@ def parse_valor_monetario(valor) -> float:
             return 0.0
     return 0.0
 
-def formatar_moeda(self, valor) -> str:
+def formatar_moeda(valor) -> str:
     """
     Converte float (1234.50) para formato BRL (R$ 1.234,50).
     Necessário pois o Service retorna float puro.
