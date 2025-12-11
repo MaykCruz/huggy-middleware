@@ -3,6 +3,8 @@ from app.services.bot.memory.session import SessionManager
 from app.integrations.huggy.service import HuggyService
 from app.services.products.fgts_service import FGTSService 
 from app.schemas.credit import AnalysisStatus
+from app.tasks.monitor import check_inactivity
+from app.core.timeouts import TIMEOUT_POLICES
 from app.utils.validators import validate_cpf, clean_digits
 
 
@@ -17,7 +19,20 @@ class BotEngine:
         self.huggy = HuggyService()
         self.fgts_service = FGTSService()
 
+    def _schedule_timeout(self, chat_id: int, state: str, interaction_time: int):
+        """
+        Verifica se existe uma regra de timeout para o estado 'state' e agenda a task no Celery.
+        """
+        rule = TIMEOUT_POLICES.get(state)
+
+        if rule:
+            check_inactivity.apply_async(
+                args=[chat_id, state, interaction_time, 0],
+                countdown=rule['delay']
+            )
+
     def process(self, chat_id: int, message_text: str):
+        interaction_time = self.session.touch(chat_id)
         current_state = self.session.get_state(chat_id)
         context = self.session.get_context(chat_id)
 
@@ -31,6 +46,7 @@ class BotEngine:
         if current_state == "START":
             self.huggy.send_message(chat_id, "menu_bem_vindo")
             next_state = "MENU_APRESENTACAO"
+            self._schedule_timeout(chat_id, next_state, interaction_time)
 
         # 1. Menu Inicial
         elif current_state == "MENU_APRESENTACAO":
@@ -39,13 +55,61 @@ class BotEngine:
             if opt == "1": # CLT
                 self.huggy.send_message(chat_id, "pedir_cpf")
                 next_state = "CLT_AGUARDANDO_CPF"
+                self._schedule_timeout(chat_id, next_state, interaction_time)
             
             elif opt == "2": # FGTS
                 self.huggy.send_message(chat_id, "pedir_cpf")
                 next_state = "FGTS_AGUARDANDO_CPF"
+                self._schedule_timeout(chat_id, next_state, interaction_time)
             
             else:
                 self._handoff_human(chat_id)
+                next_state = "FINISHED"
+        
+        elif current_state == "MENU_TIMEOUT_1":
+            opt = message_text.strip()
+
+            if opt == "1": # CLT
+                self.huggy.send_message(chat_id, "pedir_cpf")
+                next_state = "CLT_AGUARDANDO_CPF"
+                self._schedule_timeout(chat_id, next_state, interaction_time)
+
+            elif opt == "2": # FGTS
+                self.huggy.send_message(chat_id, "pedir_cpf")
+                next_state = "FGTS_AGUARDANDO_CPF"
+                self._schedule_timeout(chat_id, next_state, interaction_time)
+
+            else:
+                self._handoff_human(chat_id)
+                next_state = "FINISHED"
+
+        elif current_state == "MENU_TIMEOUT_2":
+            opt = message_text.strip()
+
+            if opt == "1": # CLT
+                self.huggy.send_message(chat_id, "pedir_cpf")
+                next_state = "CLT_AGUARDANDO_CPF"
+                self._schedule_timeout(chat_id, next_state, interaction_time)
+
+            elif opt == "2": # FGTS
+                self.huggy.send_message(chat_id, "pedir_cpf")
+                next_state = "FGTS_AGUARDANDO_CPF"
+                self._schedule_timeout(chat_id, next_state, interaction_time)
+
+            else:
+                self._handoff_human(chat_id)
+                next_state = "FINISHED"
+
+        elif current_state == "CPF_TIMEOUT":
+            opt = message_text.strip()
+
+            if opt == "1": # Sim
+                self.huggy.start_auto_distribution(chat_id)
+                next_state = "FINISHED"
+            
+            elif opt == "2": # Não
+                self.huggy.send_message(chat_id, "sem_interesse")
+                self.huggy.finish_attendance(chat_id, tabulation_id=self.huggy.tabulations.get("SEM_INTERESSE"))
                 next_state = "FINISHED"
 
         # ---------------------------------------------------------
@@ -68,7 +132,7 @@ class BotEngine:
                     self.huggy.send_message(chat_id, "cpf_invalido")
                     next_state = "CLT_CPF_INVALIDO"
                 else:
-                    self.huggy.send_message(chat_id, "invalid_cpf_fallback_human")
+                    self.huggy.send_message(chat_id, "cpf_invalido_fallback", force_internal=True)
                     self.huggy.start_auto_distribution(chat_id)
                     next_state = "FINISHED"
 

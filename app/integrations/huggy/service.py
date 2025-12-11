@@ -29,7 +29,8 @@ class HuggyService:
             "MUDANCAS_CADASTRAIS": os.getenv("HUGGY_MUDANCADAS_CADASTRAIS"),
             "ANIVERSARIANTE": os.getenv("HUGGY_ANIVERSARIANTE"),
             "SALDO_NAO_ENCONTRADO": os.getenv("HUGGY_SALDO_NAO_ENCONTRADO"),
-            "SEM_SALDO": os.getenv("HUGGY_SEM_SALD0")
+            "SEM_SALDO": os.getenv("HUGGY_SEM_SALD0"),
+            "SEM_INTERESSE": os.getenv("HUGGY_SEM_INTERESSE")
         }
 
     def send_message(self, chat_id: int, message_key: str, variables: Dict[str, Any] = None, file_url: Optional[str] = None, force_internal: bool = False) -> bool:

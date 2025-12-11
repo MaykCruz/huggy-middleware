@@ -2,6 +2,7 @@ import redis
 import os
 import logging
 import json
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,22 @@ class SessionManager:
     
     def _get_key_context(self, chat_id: str):
         return f"chat:{chat_id}:context"
+    
+    def _get_key_interaction(self, chat_id: str):
+        return f"chat:{chat_id}:last_interaction"
+    
+    def touch(self, chat_id: int):
+        """Atualiza o timestamp da última interação para AGORA"""
+        key = self._get_key_interaction(chat_id)
+        now = int(time.time())
+        self.redis_client.set(key, now, ex=self.expire_time)
+        return now
+    
+    def get_last_interaction(self, chat_id: int):
+        """Retorna o timestamp da última interação"""
+        key = self._get_key_interaction(chat_id)
+        val = self.redis_client.get(key)
+        return int(val) if val else 0
     
     def clear_session(self, chat_id: int):
         """

@@ -59,5 +59,32 @@
             {"id": "1", "title": "Sim"},
             {"id": "2", "title": "Não"}
         ]
+    },
+    "timeout_1_menu": {
+        "text": "Olá, vamos prosseguir com o atendimento?",
+        "options": [
+            {"id": "1", "title": "Simular CLT"},
+            {"id": "2", "title": "Simular FGTS"}
+        ]
+    },
+    "timeout_2_menu": {
+        "text": "Olá, gostaria de prosseguir com a simulação?",
+        "options": [
+            {"id": "1", "title": "Simular CLT"},
+            {"id": "2", "title": "Simular FGTS"}
+        ]
+    },
+    "timeout_finalizar": {
+        "text": "Parece que você não pode falar agora. Então estou finalizando o seu atendimento e seguimos trabalhando para garantir a melhor experiência possível!\nSe tiver alguma dúvida ou precisar de ajuda, basta nos chamar!\nAté mais!"
+    },
+    "timeout_1_cpf": {
+        "text": "Olá? Gosaria de prosseguir com a simulação?",
+        "options": [
+            {"id": "1", "title": "Sim"},
+            {"id": "2", "title": "Não, obrigado"}
+        ]
+    },
+    "sem_interesse": {
+        "text": "Sem problemas, precisando estamos a disposição!"
     }
 }
