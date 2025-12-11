@@ -14,7 +14,12 @@ class EventDispatcher:
     TARGER_SENDER_TYPE = os.getenv("HUGGY_FILTER_SENDER_TYPE","whatsapp-enterprise")
 
     @staticmethod
-    def _shoud_ignore(event_data: dict) -> bool:
+    def shoud_ignore_event_data(event_data: dict) -> bool:
+        """
+        [FILTRO RIGOROSO]
+        Aplica as regras de negócio EXATAMENTE como estavam.
+        Returna True se o evento deve ser ignorado.
+        """
         chat_info = event_data.get("chat", {})
         chat_id = chat_info.get("id", "unknown")
 
@@ -29,7 +34,6 @@ class EventDispatcher:
         
         raw_dept = chat_info.get("department")
         incoming_dept = str(raw_dept)
-
         if incoming_dept != EventDispatcher.TARGET_DEPARTMENT_ID:
             logger.debug(f"⛔ [Filter] Chat {chat_id}: Msg ignorada (Dept '{incoming_dept}' != '{EventDispatcher.TARGET_DEPARTMENT_ID}').")
             return True
@@ -41,6 +45,34 @@ class EventDispatcher:
         
         return False
 
+    @staticmethod
+    def should_filter_payload(payload: dict) -> bool:
+        """
+        [NOVO MÉTODO PARA A API]
+        Analisa o payload BRUTO antes de enviar para o Celery.
+
+        Regra:
+        - Se for 'receivedAllMessage': APLICA os filtros acima.
+        - Se for 'closedChat' (ou outros): ACEITA TUDO (Retorna False)
+        """
+        try:
+            messages = payload.get("messages", {})
+            if not messages: return True
+
+            event_type = next(iter(messages))
+
+            if event_type == "receivedAllMessage":
+                content_list = messages.get(event_type, [])
+                if not content_list: return True
+
+                event_data = content_list[0]
+                return EventDispatcher.shoud_ignore_event_data(event_data)
+            
+            return False
+        
+        except Exception as e:
+            logger.error(f"⚠️ Erro ao pré-filtrar payload: {e}")
+            return False
 
     @staticmethod
     def dispatch(payload: dict):
@@ -67,7 +99,7 @@ class EventDispatcher:
             service.handle(chat_id)
             
         elif event_type == "receivedAllMessage":
-            if EventDispatcher._shoud_ignore(event_data):
+            if EventDispatcher.shoud_ignore_event_data(event_data):
                 return
 
             chat_id = event_data.get('chat', {}).get('id')

@@ -1,6 +1,7 @@
 import json
 from fastapi import APIRouter, HTTPException, Request
 from app.tasks.processor import process_webhook_event
+from app.events.dispatcher import EventDispatcher
 import logging
 
 router = APIRouter()
@@ -9,10 +10,15 @@ logger = logging.getLogger(__name__)
 @router.post("/webhook")
 async def receive_webhook(request: Request):
     """
-    Recebe o payload da Huggy e enfileira para processamento assíncrono.
+    Recebe o payload da Huggy.
+    1. Verifica se deve ser ignorado (Filtro Rápido).
+    2. Se válido (receivedAllMessage aprovada OU closedChat), enfileira.
     """
     try:
         payload = await request.json()
+
+        if EventDispatcher.should_filter_payload(payload):
+            return {"status": "ignored", "reason": "Filtered by business rules"}
 
         if logger.isEnabledFor(logging.DEBUG):
             payload_str = json.dumps(payload, indent=2, ensure_ascii=False)
