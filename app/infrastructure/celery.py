@@ -1,6 +1,6 @@
 import os
 from celery import Celery
-from celery.signals import setup_logging
+from celery.signals import setup_logging, worker_process_init
 from dotenv import load_dotenv
 from app.core.logger import setup_logging as configure_custom_logging
 
@@ -14,6 +14,10 @@ BACKEND_URL = os.getenv("CELERY_RESULT_BACKEND")
 def config_loggers(*args, **kwargs):
     configure_custom_logging()
 # -------------------------------
+
+@worker_process_init.connect
+def init_worker_logger(*args, **kwargs):
+    configure_custom_logging()
 
 celery_app = Celery(
     "worker",
