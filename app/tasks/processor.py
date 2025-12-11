@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
         name="process_webhook_event",
         bind=True,
         acks_late=True,
+        ignore_result=True,
         autoretry_for=(httpx.HTTPError, ConnectionError, TimeoutError),
         retry_backoff=True,
         retry_backoff_max=60,
