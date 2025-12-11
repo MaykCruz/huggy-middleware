@@ -19,7 +19,10 @@ celery_app = Celery(
     "worker",
     broker=BROKEN_URL,
     backend=BACKEND_URL,
-    include=["app.tasks.processor"],
+    include=[
+        "app.tasks.processor",
+        "app.tasks.monitor"
+    ],
 )
 
 # --- Configurações de Robustez ---

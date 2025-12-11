@@ -48,6 +48,12 @@ TIMEOUT_POLICES = {
             "action": "KILL",
             "message_key": "timeout_finalizar",
             "tabulation_key": "SEM_RETORNO_DO_CLIENTE"
+        },
+    "CLT_CPF_INVALIDO":
+        {
+            "delay": 1800, # 30 minutos
+            "action": "TRANSITION",
+            "message_key": ""
         }
     
 }
