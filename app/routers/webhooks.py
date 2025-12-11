@@ -1,9 +1,10 @@
+import json
 from fastapi import APIRouter, HTTPException, Request
 from app.tasks.processor import process_webhook_event
 import logging
 
 router = APIRouter()
-logger = logging.getLogger("uvicorn")
+logger = logging.getLogger(__name__)
 
 @router.post("/webhook")
 async def receive_webhook(request: Request):
@@ -13,9 +14,13 @@ async def receive_webhook(request: Request):
     try:
         payload = await request.json()
 
+        if logger.isEnabledFor(logging.DEBUG):
+            payload_str = json.dumps(payload, indent=2, ensure_ascii=False)
+            logger.debug(f"📦 [DEBUG] Payload Recebido:\n{payload_str}")
+
         task = process_webhook_event.delay(payload)
 
-        logger.info(f"📨 [API] Webhook recebido e enfileirado. Task ID: {task.id}")
+        logger.debug(f"📨 [API] Webhook recebido e enfileirado. Task ID: {task.id}")
 
         return {
             "status": "received",
