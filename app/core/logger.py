@@ -4,7 +4,7 @@ from logtail import LogtailHandler
 
 def setup_logging():
     """
-    Configura o logger raiz.
+    Configura o logger raiz e aplica silenciadores nas bibliotecas de terceiros.
     """
     log_formatter = logging.Formatter(
         fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -38,3 +38,17 @@ def setup_logging():
             print(f"❌ Erro ao configurar Better Stack: {e}")
     else:
         print("⚠️ BETTER_STACK_SOURCE_TOKEN não encontrado. Logs apenas locais.")
+    
+    if log_level == "DEBUG":
+        noisy_libraries = [
+            "urllib3", "urllib3.connectionpool", "urllib3.util.retry",
+            "uvicorn", "uvicorn.access", "uvicorn.error",
+            "httpcore", "httpx", "hpack",
+            "celery", "celery.worker", "celery.task", "celery.redirected",
+            "kombu", "amqp", "vine",
+            "redis", 
+            "asyncio", "watchfiles"
+        ]
+
+        for lib in noisy_libraries:
+            logging.getLogger(lib).setLevel(logging.WARNING)
