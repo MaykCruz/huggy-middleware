@@ -27,7 +27,7 @@ class BotEngine:
 
         if rule:
             check_inactivity.apply_async(
-                args=[chat_id, state, interaction_time, 0],
+                args=[chat_id, state, interaction_time],
                 countdown=rule['delay']
             )
 
