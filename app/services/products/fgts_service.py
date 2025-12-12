@@ -108,6 +108,14 @@ class FGTSService:
                 raw_details=resultado_raw
             )
         
+        if motivo == "LIMITE_EXCEDIDO_CONSULTAS_FGTS":
+            return CreditOffer(
+                status=AnalysisStatus.LIMITE_EXCEDIDO_CONSULTAS_FGTS,
+                message_key="limite_excedido_fgts",
+                is_internal=True,
+                raw_details=resultado_raw
+            )
+        
         msg_tecnica = resultado_raw.get("msg_tecnica", str(motivo))
 
         return CreditOffer(

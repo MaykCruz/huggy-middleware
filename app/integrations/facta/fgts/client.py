@@ -119,6 +119,9 @@ class FactaFGTSAdapter:
         # Sem saldo
         if "cliente não possui saldo fgts" in msg:
             return "SEM_SALDO"
+        
+        if "limite mensal de consultas fgts excedido" in msg:
+            return "LIMITE_EXCEDIDO_CONSULTAS_FGTS"
             
         return "RETORNO_DESCONHECIDO"
     
