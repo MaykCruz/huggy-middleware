@@ -109,8 +109,15 @@ class FGTSService:
             )
         
         if motivo == "RETORNO_DESCONHECIDO":
+
+            erro_tecnico = resultado_raw.get("msg_tecnica", "Motivo não especificado pela API")
+
             return CreditOffer(
                 status=AnalysisStatus.RETORNO_DESCONHECIDO,
                 message_key="retorno_desconhecido",
-                is_internal=True
+                is_internal=True,
+                variables={
+                    "erro": erro_tecnico
+                },
+                raw_details=resultado_raw
             )

@@ -2,8 +2,14 @@
     "menu_bem_vindo": {
         "text": "Olá, boas vindas à Empreste Digital!👋😊\n\nTemos um grande prazer em te atender!\nMe diga, como podemos te ajudar hoje?\n\nO crédito do trabalhador é ideal para quem precisa de um recurso rápido com baixo juros.",
         "options": [
-            {"id": "1", "title": "Empréstimo CLT"},
-            {"id": "2", "title": "Antecipação FGTS"}
+            {
+                "id": "1",
+                "title": "Empréstimo CLT"
+            },
+            {
+                "id": "2",
+                "title": "Antecipação FGTS"
+            }
         ]
     },
     "pedir_cpf": {
@@ -21,9 +27,18 @@
     "com_saldo_conta": {
         "text": "Realizei a simulação e *R$ {valor}* estão liberados! 💸\nEsse valor libera em sua conta ainda hoje!\n\nPosso prosseguir com a liberação na sua conta abaixo?\n\n{dados_bancarios}",
         "options": [
-            {"id": "1", "title": "Pode prosseguir!"},
-            {"id": "2", "title": "Alterar minha conta!"},
-            {"id": "3", "title": "Tenho dúvidas!"}
+            {
+                "id": "1",
+                "title": "Pode prosseguir!"
+            },
+            {
+                "id": "2",
+                "title": "Alterar minha conta!"
+            },
+            {
+                "id": "3",
+                "title": "Tenho dúvidas!"
+            }
         ]
     },
     "sem_autorizacao": {
@@ -39,13 +54,12 @@
     "saldo_nao_encontrado": {
         "text": "Infelizmente não vou conseguir realizar a simulação devido a um erro da Caixa que não encontra o seu saldo!\nA orientação é que procure uma agência da Caixa Econômica para resolução desse erro!",
         "file": "https://i.postimg.cc/BQqR2chG/saldo-nao-encontrado.jpg"
-
     },
     "sem_saldo": {
         "text": "Acabei de consultar aqui e seu saldo ainda não atualizou! As atualizações começam dia 20 e vão até o dia 27, no decorrer desses dias já deve liberar! Vou consultando aqui e assim que estiver liberando te chamo ☺"
     },
     "retorno_desconhecido": {
-        "text": "Ocorreu um erro inesperado durante a simulação. Autodistribuindo..."
+        "text": "⚠️ ERRO NA SIMULAÇÃO:\n{erro}\n\nO robô transferiu para atendimento humano."
     },
     "iniciando_simulacao": {
         "text": "Agradeço! Só um instante que já irei realizar a simulação.\n\nAviso que pode demorar alguns minutinhos, pois os bancos estão apresentando lentidão essa semana devido ao alto fluxo! Assim que o banco retornar sua simulação eu já te informo."
@@ -56,22 +70,40 @@
     "tempo_de_registro": {
         "text": "Perfeito, já recebi seu CPF. Você possui mais de 6 meses de registro no emprego atual?",
         "options": [
-            {"id": "1", "title": "Sim"},
-            {"id": "2", "title": "Não"}
+            {
+                "id": "1",
+                "title": "Sim"
+            },
+            {
+                "id": "2",
+                "title": "Não"
+            }
         ]
     },
     "timeout_1_menu": {
         "text": "Olá, vamos prosseguir com o atendimento?",
         "options": [
-            {"id": "1", "title": "Simular CLT"},
-            {"id": "2", "title": "Simular FGTS"}
+            {
+                "id": "1",
+                "title": "Simular CLT"
+            },
+            {
+                "id": "2",
+                "title": "Simular FGTS"
+            }
         ]
     },
     "timeout_2_menu": {
         "text": "Olá, gostaria de prosseguir com a simulação?",
         "options": [
-            {"id": "1", "title": "Simular CLT"},
-            {"id": "2", "title": "Simular FGTS"}
+            {
+                "id": "1",
+                "title": "Simular CLT"
+            },
+            {
+                "id": "2",
+                "title": "Simular FGTS"
+            }
         ]
     },
     "timeout_finalizar": {
@@ -80,8 +112,14 @@
     "timeout_1_cpf": {
         "text": "Olá? Gosaria de prosseguir com a simulação?",
         "options": [
-            {"id": "1", "title": "Sim"},
-            {"id": "2", "title": "Não, obrigado"}
+            {
+                "id": "1",
+                "title": "Sim"
+            },
+            {
+                "id": "2",
+                "title": "Não, obrigado"
+            }
         ]
     },
     "sem_interesse": {
