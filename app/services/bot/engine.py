@@ -204,6 +204,10 @@ class BotEngine:
                     self.huggy.finish_attendance(chat_id, tabulation_id=self.huggy.tabulations.get("SEM_SALDO"))
                     next_state = "FINISHED"
                 
+                if oferta.status == AnalysisStatus.LIMITE_EXCEDIDO_CONSULTAS_FGTS:
+                    self.huggy.start_auto_distribution(chat_id)
+                    next_state = "FINISHED"
+                
                 if oferta.status == AnalysisStatus.RETORNO_DESCONHECIDO:
                     self.huggy.start_auto_distribution(chat_id)
                     next_state = "FINISHED"
