@@ -7,14 +7,26 @@ from app.infrastructure.token_manager import TokenManager
 
 logger = logging.getLogger(__name__)
 
+def create_client(timeout: float = 30.0) -> httpx.Client:
+        """
+        Fábrica única de Clientes HTTP para a Facta.
+        Já injeta Proxy (se existir no .env) e define o Timeout padrão.
+        """
+        proxy_url = os.getenv("FACTA_PROXY_URL")
+        client_kwargs = {"timeout": 30.0}
+
+        if proxy_url:
+            client_kwargs["proxy"] = proxy_url
+        
+        return httpx.Client(**client_kwargs)
+
 class FactaAuth:
     def __init__(self):
         self.base_url = os.getenv("FACTA_API_URL", "https://webservice-homol.facta.com.br")
         self.user = os.getenv("FACTA_USER")
         self.password = os.getenv("FACTA_PASSWORD")
-
+        
         self.token_manager = TokenManager()
-
         self.SCOPE = "FACTA"
 
     def get_valid_token(self) -> str:
@@ -30,9 +42,7 @@ class FactaAuth:
             try:
                logger.info("🔑 [FACTA] Iniciando renovação de token na API...")
                new_token = self._request_api_token()
-
                self.token_manager.save_token(self.SCOPE, new_token, 3500)
-
                return new_token
             except Exception as e:
                 self.token_manager.release_lock(self.SCOPE)
@@ -64,7 +74,7 @@ class FactaAuth:
         }
 
         try:
-            with httpx.Client(timeout=15.0) as client:
+            with create_client() as client:
                 response = client.get(url, headers=headers)
                 response.raise_for_status()
 

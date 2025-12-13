@@ -1,6 +1,6 @@
 import httpx
 import logging
-from app.integrations.facta.auth import FactaAuth
+from app.integrations.facta.auth import FactaAuth, create_client
 from app.utils.formatters import parse_valor_monetario
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ class FactaFGTSAdapter:
         params = {"cpf": cpf, "banco": "facta"}
 
         try:
-            with httpx.Client(timeout=30.0) as client:
+            with create_client() as client:
                 logger.info(f"💰 [Facta] Consultando saldo para CPF {cpf}...")
                 response = client.get(url, headers=self._get_headers, params=params)
                 data = response.json()
@@ -58,7 +58,7 @@ class FactaFGTSAdapter:
         }
 
         try:
-            with httpx.Client(timeout=30.0) as client:
+            with create_client() as client:
                 resp = client.post(url, headers=self._get_headers, json=body)
                 data = resp.json()
                 
