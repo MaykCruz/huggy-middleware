@@ -1,6 +1,6 @@
 import os
 import redis
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException, status, Depends
 from dotenv import load_dotenv
 from app.infrastructure.celery import celery_app
 from app.routers import webhooks
@@ -13,6 +13,24 @@ setup_logging()
 app = FastAPI(title="Huggy Middleware")
 
 app.include_router(webhooks.router)
+
+def verify_admin_token(x_admin_token: str = Header(default=None)):
+    """
+    Verfica se o header 'x-admin-token' bate com a senha do .env.
+    """
+    expected_token = os.getenv("ADMIN_API_TOKEN")
+
+    if not expected_token:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="ADMIN_API_TOKEN não configurado no servidor."
+        )
+    
+    if x_admin_token != expected_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token de administração inválido ou ausente 🚫"
+        )
 
 @app.get("/")
 async def root():
@@ -28,11 +46,12 @@ async def check_celery():
     except Exception as e:
         return {"status": "error", "details": str(e)}
 
-@app.post("/admin/refresh-messages")
+@app.post("/admin/refresh-messages", dependencies=[Depends(verify_admin_token)])
 async def refresh_messages():
     """
     Limpa o cache de mensagens no Redis.
     Isso força o bot a baixar a versão mais recente do Gist na próxima interação.
+    🔒 Protegido: Exige header 'x-admin-token'
     """
     try:
         redis_url = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
