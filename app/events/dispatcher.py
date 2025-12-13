@@ -9,7 +9,7 @@ class EventDispatcher:
     Responsável por analisar o tipo de evento recebido da Huggy
     e direcionar para o Service correto (Use Case).
     """
-    TARGET_DEPARTMENT_ID = os.getenv("HUGGY_FILTER_DEPARTMENT", "")
+    TARGET_ENTRYPOINT = os.getenv("HUGGY_FILTER_ENTRYPOINT")
     TARGET_SITUATION = os.getenv("HUGGY_FILTER_SITUATION", "auto")
     TARGER_SENDER_TYPE = os.getenv("HUGGY_FILTER_SENDER_TYPE","whatsapp-enterprise")
 
@@ -31,11 +31,10 @@ class EventDispatcher:
         if sender_type != EventDispatcher.TARGER_SENDER_TYPE:
             logger.debug(f"⛔ [Filter] Chat {chat_id}: Msg ignorada (Canal '{sender_type}').")
             return True
-        
-        raw_dept = chat_info.get("department")
-        incoming_dept = str(raw_dept)
-        if incoming_dept != EventDispatcher.TARGET_DEPARTMENT_ID:
-            logger.debug(f"⛔ [Filter] Chat {chat_id}: Msg ignorada (Dept '{incoming_dept}' != '{EventDispatcher.TARGET_DEPARTMENT_ID}').")
+
+        entrypoint = chat_info.get("entrypoint")
+        if str(entrypoint) != str(EventDispatcher.TARGET_ENTRYPOINT):
+            logger.debug(f"⛔ [Filter] Chat {chat_id}: Ignorada (Entrypoint '{entrypoint}' != '{EventDispatcher.TARGET_ENTRYPOINT}').")
             return True
         
         situation = chat_info.get("situation")
